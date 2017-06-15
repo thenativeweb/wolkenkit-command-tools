@@ -1,0 +1,35 @@
+{
+  "name": "wolkenkit-command-tools",
+  "version": "0.0.0",
+  "description": "wolkenkit-command-tools is a collection of tools for commands.",
+  "contributors": [
+    {
+      "name": "Golo Roden",
+      "email": "golo.roden@thenativeweb.io"
+    },
+    {
+      "name": "Matthias Wagler",
+      "email": "matthias.wagler@thenativeweb.io"
+    }
+  ],
+  "main": "lib/index.js",
+  "dependencies": {
+    "ajv": "5.1.5",
+    "humanize-string": "1.0.1",
+    "require-dir": "0.3.2"
+  },
+  "devDependencies": {
+    "assertthat": "0.9.0",
+    "commands-events": "1.0.0",
+    "roboter": "0.15.2",
+    "roboter-server": "0.15.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thenativeweb/wolkenkit-command-tools.git"
+  },
+  "keywords": [
+    "wolkenkit"
+  ],
+  "license": "AGPL-3.0"
+}
