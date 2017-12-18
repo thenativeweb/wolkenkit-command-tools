@@ -13,7 +13,7 @@ $ npm install wolkenkit-command-tools
 First you need to integrate wolkenkit-command-tools into your application. Typically, you will only require a specific set of tools, e.g. the `only` middleware.
 
 ```javascript
-const only = require('wolkenkit-command-tools').only;
+const { only } = require('wolkenkit-command-tools');
 ```
 
 ### Using middleware
@@ -147,14 +147,14 @@ const commands = {
 };
 ```
 
-#### only.ifValidatedBy
+#### only.ifCommandValidatedBy
 
 This middleware passes if the command data can be validated by the given JSON schema, otherwise it rejects the command.
 
 ```javascript
 const commands = {
   start: [
-    only.ifValidatedBy({
+    only.ifCommandValidatedBy({
       type: 'object',
       properties: {
         // ...
@@ -172,7 +172,44 @@ Alternatively, you may also provide a validation function. This function must re
 ```javascript
 const commands = {
   start: [
-    only.ifValidatedBy(data => {
+    only.ifCommandValidatedBy(data => {
+      // return true;
+      // - or -
+      // return false;
+    }),
+    (peerGroup, command, mark) => {
+      // ...
+    }
+  ]
+};
+```
+
+#### only.ifStateValidatedBy
+
+This middleware passes if the aggregate state can be validated by the given JSON schema, otherwise it rejects the command.
+
+```javascript
+const commands = {
+  start: [
+    only.ifStateValidatedBy({
+      type: 'object',
+      properties: {
+        // ...
+      }
+    }),
+    (peerGroup, command, mark) => {
+      // ...
+    }
+  ]
+};
+```
+
+Alternatively, you may also provide a validation function. This function must return `true` if the validation was successful, otherwise `false`.
+
+```javascript
+const commands = {
+  start: [
+    only.ifStateValidatedBy(state => {
       // return true;
       // - or -
       // return false;

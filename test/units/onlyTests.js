@@ -219,18 +219,55 @@ suite('only', () => {
       done();
     });
 
+    suite('instance', () => {
+      test('marks as ready for next if the command data is valid.', done => {
+        const ifValidatedBy = only.ifValidatedBy({
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            age: { type: 'number' },
+            pets: { type: 'array', items: { type: 'string' }}
+          },
+          required: [ 'name', 'age', 'pets' ]
+        });
+
+        const aggregate = {};
+
+        const command = {
+          data: {
+            name: 'Jane Doe',
+            age: 35,
+            pets: [ 'Alice' ]
+          }
+        };
+
+        ifValidatedBy(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
+      });
+    });
+  });
+
+  suite('ifCommandValidatedBy', () => {
+    test('is a function.', done => {
+      assert.that(only.ifCommandValidatedBy).is.ofType('function');
+      done();
+    });
+
     test('throws an error if schema is missing.', done => {
       assert.that(() => {
-        only.ifValidatedBy();
+        only.ifCommandValidatedBy();
       }).is.throwing('Schema is missing.');
       done();
     });
 
     suite('instance', () => {
-      let ifValidatedBy;
+      let ifCommandValidatedBy;
 
       setup(() => {
-        ifValidatedBy = only.ifValidatedBy({
+        ifCommandValidatedBy = only.ifCommandValidatedBy({
           type: 'object',
           properties: {
             name: { type: 'string' },
@@ -242,7 +279,7 @@ suite('only', () => {
       });
 
       test('is a function.', done => {
-        assert.that(ifValidatedBy).is.ofType('function');
+        assert.that(ifCommandValidatedBy).is.ofType('function');
         done();
       });
 
@@ -257,7 +294,7 @@ suite('only', () => {
           }
         };
 
-        ifValidatedBy(aggregate, command, {
+        ifCommandValidatedBy(aggregate, command, {
           asReadyForNext () {
             done();
           }
@@ -275,7 +312,7 @@ suite('only', () => {
           }
         };
 
-        ifValidatedBy(aggregate, command, {
+        ifCommandValidatedBy(aggregate, command, {
           asRejected (reason) {
             assert.that(reason).is.equalTo('Age is invalid.');
             done();
@@ -294,7 +331,7 @@ suite('only', () => {
           }
         };
 
-        ifValidatedBy(aggregate, command, {
+        ifCommandValidatedBy(aggregate, command, {
           asRejected (reason) {
             assert.that(reason).is.equalTo('Pets/1 is invalid.');
             done();
@@ -309,7 +346,7 @@ suite('only', () => {
           data: {}
         };
 
-        ifValidatedBy(aggregate, command, {
+        ifCommandValidatedBy(aggregate, command, {
           asRejected (reason) {
             assert.that(reason).is.equalTo('Data is invalid.');
             done();
@@ -322,7 +359,7 @@ suite('only', () => {
 
         const command = {};
 
-        ifValidatedBy(aggregate, command, {
+        ifCommandValidatedBy(aggregate, command, {
           asRejected (reason) {
             assert.that(reason).is.equalTo('Data is invalid.');
             done();
@@ -332,7 +369,7 @@ suite('only', () => {
 
       suite('with a validation function', () => {
         setup(() => {
-          ifValidatedBy = only.ifValidatedBy(commandData =>
+          ifCommandValidatedBy = only.ifCommandValidatedBy(commandData =>
             typeof commandData.name === 'string');
         });
 
@@ -345,7 +382,7 @@ suite('only', () => {
             }
           };
 
-          ifValidatedBy(aggregate, command, {
+          ifCommandValidatedBy(aggregate, command, {
             asReadyForNext () {
               done();
             }
@@ -361,7 +398,166 @@ suite('only', () => {
             }
           };
 
-          ifValidatedBy(aggregate, command, {
+          ifCommandValidatedBy(aggregate, command, {
+            asRejected (reason) {
+              assert.that(reason).is.equalTo('Data is invalid.');
+              done();
+            }
+          });
+        });
+      });
+    });
+  });
+
+  suite('ifStateValidatedBy', () => {
+    test('is a function.', done => {
+      assert.that(only.ifStateValidatedBy).is.ofType('function');
+      done();
+    });
+
+    test('throws an error if schema is missing.', done => {
+      assert.that(() => {
+        only.ifStateValidatedBy();
+      }).is.throwing('Schema is missing.');
+      done();
+    });
+
+    suite('instance', () => {
+      let ifStateValidatedBy;
+
+      setup(() => {
+        ifStateValidatedBy = only.ifStateValidatedBy({
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            age: { type: 'number' },
+            pets: { type: 'array', items: { type: 'string' }}
+          },
+          required: [ 'name', 'age', 'pets' ]
+        });
+      });
+
+      test('is a function.', done => {
+        assert.that(ifStateValidatedBy).is.ofType('function');
+        done();
+      });
+
+      test('marks as ready for next if the aggregate state is valid.', done => {
+        const aggregate = {
+          state: {
+            name: 'Jane Doe',
+            age: 35,
+            pets: [ 'Alice' ]
+          }
+        };
+
+        const command = {};
+
+        ifStateValidatedBy(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
+      });
+
+      test('marks as rejected if the aggregate state is not valid.', done => {
+        const aggregate = {
+          state: {
+            name: 'Jane Doe',
+            age: '35',
+            pets: [ 'Alice' ]
+          }
+        };
+
+        const command = {};
+
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Age is invalid.');
+            done();
+          }
+        });
+      });
+
+      test('marks as rejected if nested aggregate state is not valid.', done => {
+        const aggregate = {
+          state: {
+            name: 'Jane Doe',
+            age: 35,
+            pets: [ 'Alice', 42 ]
+          }
+        };
+
+        const command = {};
+
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Pets/1 is invalid.');
+            done();
+          }
+        });
+      });
+
+      test('marks as rejected if the aggregate state is empty.', done => {
+        const aggregate = {
+          state: {}
+        };
+
+        const command = {};
+
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Data is invalid.');
+            done();
+          }
+        });
+      });
+
+      test('marks as rejected if the aggregate state is missing.', done => {
+        const aggregate = {};
+
+        const command = {};
+
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Data is invalid.');
+            done();
+          }
+        });
+      });
+
+      suite('with a validation function', () => {
+        setup(() => {
+          ifStateValidatedBy = only.ifStateValidatedBy(aggregateState =>
+            typeof aggregateState.name === 'string');
+        });
+
+        test('marks as ready for next if the validation functions returns true.', done => {
+          const aggregate = {
+            state: {
+              name: 'Jane Doe'
+            }
+          };
+
+          const command = {};
+
+          ifStateValidatedBy(aggregate, command, {
+            asReadyForNext () {
+              done();
+            }
+          });
+        });
+
+        test('marks as rejected if the validation functions returns false.', done => {
+          const aggregate = {
+            state: {
+              name: 23
+            }
+          };
+
+          const command = {};
+
+          ifStateValidatedBy(aggregate, command, {
             asRejected (reason) {
               assert.that(reason).is.equalTo('Data is invalid.');
               done();
