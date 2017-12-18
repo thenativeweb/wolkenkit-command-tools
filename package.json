@@ -10,19 +10,23 @@
     {
       "name": "Matthias Wagler",
       "email": "matthias.wagler@thenativeweb.io"
+    },
+    {
+      "name": "Jan-Hendrik Grundhöfer",
+      "email": "jan-hendrik.grundhoefer@thenativeweb.io"
     }
   ],
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "dependencies": {
-    "ajv": "5.1.5",
+    "ajv": "5.5.2",
     "humanize-string": "1.0.1",
     "require-dir": "0.3.2"
   },
   "devDependencies": {
-    "assertthat": "0.9.0",
+    "assertthat": "0.11.0",
     "commands-events": "1.0.0",
-    "roboter": "0.15.2",
-    "roboter-server": "0.15.2"
+    "roboter": "0.15.4",
+    "roboter-server": "0.15.4"
   },
   "repository": {
     "type": "git",

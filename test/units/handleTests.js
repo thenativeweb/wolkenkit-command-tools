@@ -3,7 +3,7 @@
 const assert = require('assertthat'),
       Command = require('commands-events').Command;
 
-const handle = require('../lib/handle');
+const handle = require('../../lib/handle');
 
 /* eslint-disable prefer-arrow-callback */
 suite('handle', function () {

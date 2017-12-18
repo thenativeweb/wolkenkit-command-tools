@@ -2,34 +2,33 @@
 
 const assert = require('assertthat');
 
-const only = require('../lib/only');
+const only = require('../../lib/only');
 
-/* eslint-disable prefer-arrow-callback */
-suite('only', function () {
-  test('is an object.', function (done) {
+suite('only', () => {
+  test('is an object.', done => {
     assert.that(only).is.ofType('object');
     done();
   });
 
-  suite('ifExists', function () {
-    test('is a function.', function (done) {
+  suite('ifExists', () => {
+    test('is a function.', done => {
       assert.that(only.ifExists).is.ofType('function');
       done();
     });
 
-    suite('instance', function () {
+    suite('instance', () => {
       let ifExists;
 
       setup(() => {
         ifExists = only.ifExists();
       });
 
-      test('is a function.', function (done) {
+      test('is a function.', done => {
         assert.that(ifExists).is.ofType('function');
         done();
       });
 
-      test('marks as ready for next if the aggregate instance exists.', function (done) {
+      test('marks as ready for next if the aggregate instance exists.', done => {
         const aggregate = {
           exists () {
             return true;
@@ -45,7 +44,7 @@ suite('only', function () {
         });
       });
 
-      test('marks as rejected if the aggregate instance does not exist.', function (done) {
+      test('marks as rejected if the aggregate instance does not exist.', done => {
         const aggregate = {
           exists () {
             return false;
@@ -68,25 +67,25 @@ suite('only', function () {
     });
   });
 
-  suite('ifNotExists', function () {
-    test('is a function.', function (done) {
+  suite('ifNotExists', () => {
+    test('is a function.', done => {
       assert.that(only.ifNotExists).is.ofType('function');
       done();
     });
 
-    suite('instance', function () {
+    suite('instance', () => {
       let ifNotExists;
 
       setup(() => {
         ifNotExists = only.ifNotExists();
       });
 
-      test('is a function.', function (done) {
+      test('is a function.', done => {
         assert.that(ifNotExists).is.ofType('function');
         done();
       });
 
-      test('marks as ready for next if the aggregate instance does not exist.', function (done) {
+      test('marks as ready for next if the aggregate instance does not exist.', done => {
         const aggregate = {
           exists () {
             return false;
@@ -102,7 +101,7 @@ suite('only', function () {
         });
       });
 
-      test('marks as rejected if the aggregate instance exists.', function (done) {
+      test('marks as rejected if the aggregate instance exists.', done => {
         const aggregate = {
           exists () {
             return true;
@@ -125,20 +124,109 @@ suite('only', function () {
     });
   });
 
-  suite('ifValidatedBy', function () {
-    test('is a function.', function (done) {
+  suite('ifInPhase', () => {
+    test('is a function.', done => {
+      assert.that(only.ifInPhase).is.ofType('function');
+      done();
+    });
+
+    suite('instance', () => {
+      test('is a function.', done => {
+        const ifInPhase = only.ifInPhase('draft');
+
+        assert.that(ifInPhase).is.ofType('function');
+        done();
+      });
+
+      test('marks as ready for next if the aggregate instance state contains the given phase.', done => {
+        const ifInPhase = only.ifInPhase('draft');
+
+        const aggregate = {
+          state: {
+            phase: 'draft'
+          }
+        };
+
+        const command = {};
+
+        ifInPhase(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
+      });
+
+      test('marks as ready for next if the aggregate instance state contains one of the given phases.', done => {
+        const ifInPhase = only.ifInPhase([ 'initial', 'draft', 'final' ]);
+
+        const aggregate = {
+          state: {
+            phase: 'draft'
+          }
+        };
+
+        const command = {};
+
+        ifInPhase(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
+      });
+
+      test('marks as ready for next if the aggregate instance state contains the given phase, albeit using a different name.', done => {
+        const ifInPhase = only.ifInPhase('draft', 'workflowStep');
+
+        const aggregate = {
+          state: {
+            workflowStep: 'draft'
+          }
+        };
+
+        const command = {};
+
+        ifInPhase(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
+      });
+
+      test('marks as rejected if the aggregate instance state does not contain the given phase.', done => {
+        const ifInPhase = only.ifInPhase([ 'initial', 'final' ]);
+
+        const aggregate = {
+          state: {
+            phase: 'draft'
+          }
+        };
+
+        const command = {};
+
+        ifInPhase(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Invalid phase.');
+            done();
+          }
+        });
+      });
+    });
+  });
+
+  suite('ifValidatedBy', () => {
+    test('is a function.', done => {
       assert.that(only.ifValidatedBy).is.ofType('function');
       done();
     });
 
-    test('throws an error if schema is missing.', function (done) {
+    test('throws an error if schema is missing.', done => {
       assert.that(() => {
         only.ifValidatedBy();
       }).is.throwing('Schema is missing.');
       done();
     });
 
-    suite('instance', function () {
+    suite('instance', () => {
       let ifValidatedBy;
 
       setup(() => {
@@ -153,12 +241,12 @@ suite('only', function () {
         });
       });
 
-      test('is a function.', function (done) {
+      test('is a function.', done => {
         assert.that(ifValidatedBy).is.ofType('function');
         done();
       });
 
-      test('marks as ready for next if the command data is valid.', function (done) {
+      test('marks as ready for next if the command data is valid.', done => {
         const aggregate = {};
 
         const command = {
@@ -176,7 +264,7 @@ suite('only', function () {
         });
       });
 
-      test('marks as rejected if the command data is not valid.', function (done) {
+      test('marks as rejected if the command data is not valid.', done => {
         const aggregate = {};
 
         const command = {
@@ -195,7 +283,7 @@ suite('only', function () {
         });
       });
 
-      test('marks as rejected if nested command data is not valid.', function (done) {
+      test('marks as rejected if nested command data is not valid.', done => {
         const aggregate = {};
 
         const command = {
@@ -214,7 +302,7 @@ suite('only', function () {
         });
       });
 
-      test('marks as rejected if the command data is empty.', function (done) {
+      test('marks as rejected if the command data is empty.', done => {
         const aggregate = {};
 
         const command = {
@@ -229,7 +317,7 @@ suite('only', function () {
         });
       });
 
-      test('marks as rejected if the command data is missing.', function (done) {
+      test('marks as rejected if the command data is missing.', done => {
         const aggregate = {};
 
         const command = {};
@@ -242,13 +330,13 @@ suite('only', function () {
         });
       });
 
-      suite('with a validation function', function () {
+      suite('with a validation function', () => {
         setup(() => {
           ifValidatedBy = only.ifValidatedBy(commandData =>
             typeof commandData.name === 'string');
         });
 
-        test('marks as ready for next if the validation functions returns true.', function (done) {
+        test('marks as ready for next if the validation functions returns true.', done => {
           const aggregate = {};
 
           const command = {
@@ -264,7 +352,7 @@ suite('only', function () {
           });
         });
 
-        test('marks as rejected if the validation functions returns false.', function (done) {
+        test('marks as rejected if the validation functions returns false.', done => {
           const aggregate = {};
 
           const command = {
@@ -284,4 +372,3 @@ suite('only', function () {
     });
   });
 });
-/* eslint-enable prefer-arrow-callback */

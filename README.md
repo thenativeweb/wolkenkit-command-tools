@@ -4,7 +4,7 @@ wolkenkit-command-tools is a collection of tools for commands.
 
 ## Installation
 
-```bash
+```shell
 $ npm install wolkenkit-command-tools
 ```
 
@@ -18,7 +18,7 @@ const only = require('wolkenkit-command-tools').only;
 
 ### Using middleware
 
-Any middleware is a function that takes a topic instance, a command and the `mark` callback as parameters. So you may use a reference to the middleware within a command definition.
+Any middleware is a function that takes a aggregate instance, a command and the `mark` callback as parameters. So you may use a reference to the middleware within a command definition.
 
 Just like in Express, all middleware uses a setup function. Hence you need to call it to get the actual middleware.
 
@@ -63,7 +63,7 @@ accessManagement.monitoring.door(id).recordEvent({
 
 #### only.ifExists
 
-This middleware passes if the topic instance exists, otherwise it rejects the command.
+This middleware passes if the aggregate instance exists, otherwise it rejects the command.
 
 ```javascript
 const commands = {
@@ -78,12 +78,68 @@ const commands = {
 
 #### only.ifNotExists
 
-This middleware passes if the topic instance does not exist, otherwise it rejects the command.
+This middleware passes if the aggregate instance does not exist, otherwise it rejects the command.
 
 ```javascript
 const commands = {
   start: [
     only.ifNotExists(),
+    (peerGroup, command, mark) => {
+      // ...
+    }
+  ]
+};
+```
+
+#### only.ifInPhase
+
+This middleware passes if the aggregate instance is in the given phase, otherwise it rejects the command.
+
+```javascript
+const initialState = {
+  phase: 'started',
+  // ...
+};
+
+const commands = {
+  join: [
+    only.ifInPhase('started'),
+    (peerGroup, command, mark) => {
+      // ...
+    }
+  ]
+};
+```
+
+You can also provide multiple phases:
+
+```javascript
+const initialState = {
+  phase: 'started',
+  // ...
+};
+
+const commands = {
+  join: [
+    only.ifInPhase([ 'started', 'ready' ]),
+    (peerGroup, command, mark) => {
+      // ...
+    }
+  ]
+};
+```
+
+When needed, you can change the name of the property to use for detecting the current phase. By default it is `phase`. To change it, hand over the desired name as second parameter to the middleware.
+
+```javascript
+const initialState = {
+  workflowStep: 'started',
+  // ...
+};
+
+const commands = {
+  join: [
+    only.ifInPhase('started', 'workflowStep'),
     (peerGroup, command, mark) => {
       // ...
     }
