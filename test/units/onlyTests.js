@@ -50,6 +50,10 @@ suite('only', () => {
           }
         };
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifExists(aggregate, command);
         }).is.throwingAsync('Peer group does not exist.');
@@ -96,6 +100,10 @@ suite('only', () => {
           aggregate: {
             name: 'peerGroup'
           }
+        };
+
+        command.reject = function (reason) {
+          throw new Error(reason);
         };
 
         await assert.that(async () => {
@@ -170,6 +178,10 @@ suite('only', () => {
 
         const command = {};
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifInPhase(aggregate, command);
         }).is.throwingAsync('Invalid phase.');
@@ -232,6 +244,10 @@ suite('only', () => {
           }
         };
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifCommandValidatedBy(aggregate, command);
         }).is.throwingAsync('Age is invalid.');
@@ -248,6 +264,10 @@ suite('only', () => {
           }
         };
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifCommandValidatedBy(aggregate, command);
         }).is.throwingAsync('Pets/1 is invalid.');
@@ -260,6 +280,10 @@ suite('only', () => {
           data: {}
         };
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifCommandValidatedBy(aggregate, command);
         }).is.throwingAsync('Data is invalid.');
@@ -269,6 +293,10 @@ suite('only', () => {
         const aggregate = {};
 
         const command = {};
+
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
 
         await assert.that(async () => {
           await ifCommandValidatedBy(aggregate, command);
@@ -300,6 +328,10 @@ suite('only', () => {
             data: {
               name: 23
             }
+          };
+
+          command.reject = function (reason) {
+            throw new Error(reason);
           };
 
           await assert.that(async () => {
@@ -365,6 +397,10 @@ suite('only', () => {
 
         const command = {};
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifStateValidatedBy(aggregate, command);
         }).is.throwingAsync('Age is invalid.');
@@ -381,6 +417,10 @@ suite('only', () => {
 
         const command = {};
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifStateValidatedBy(aggregate, command);
         }).is.throwingAsync('Pets/1 is invalid.');
@@ -393,6 +433,10 @@ suite('only', () => {
 
         const command = {};
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await ifStateValidatedBy(aggregate, command);
         }).is.throwingAsync('Data is invalid.');
@@ -402,6 +446,10 @@ suite('only', () => {
         const aggregate = {};
 
         const command = {};
+
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
 
         await assert.that(async () => {
           await ifStateValidatedBy(aggregate, command);
@@ -434,6 +482,10 @@ suite('only', () => {
           };
 
           const command = {};
+
+          command.reject = function (reason) {
+            throw new Error(reason);
+          };
 
           await assert.that(async () => {
             await ifStateValidatedBy(aggregate, command);

@@ -58,6 +58,10 @@ suite('handle', () => {
           }
         });
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await physicalEvents(aggregate, command);
         }).is.throwingAsync('Invalid request.');
@@ -74,6 +78,10 @@ suite('handle', () => {
             name: 'opened'
           }
         });
+
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
 
         await assert.that(async () => {
           await physicalEvents(aggregate, command);
@@ -93,6 +101,10 @@ suite('handle', () => {
           }
         });
 
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
+
         await assert.that(async () => {
           await physicalEvents(aggregate, command);
         }).is.throwingAsync('Invalid request.');
@@ -110,6 +122,10 @@ suite('handle', () => {
             data: {}
           }
         });
+
+        command.reject = function (reason) {
+          throw new Error(reason);
+        };
 
         await assert.that(async () => {
           await physicalEvents(aggregate, command);
