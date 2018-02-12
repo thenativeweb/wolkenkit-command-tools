@@ -1,6 +1,14 @@
 'use strict';
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var ajv = require('ajv'),
     humanizeString = require('humanize-string');
@@ -13,9 +21,9 @@ var only = {};
 
 only.ifExists = function () {
   return function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(aggregateInstance, command) {
+    var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(aggregateInstance, command) {
       var aggregateName;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
+      return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
@@ -43,9 +51,9 @@ only.ifExists = function () {
 
 only.ifNotExists = function () {
   return function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(aggregateInstance, command) {
+    var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(aggregateInstance, command) {
       var aggregateName;
-      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
@@ -81,9 +89,9 @@ only.ifInPhase = function (phase) {
   }
 
   return function () {
-    var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(aggregateInstance, command) {
+    var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(aggregateInstance, command) {
       var currentPhase;
-      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      return _regenerator2.default.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
@@ -125,8 +133,8 @@ only.ifCommandValidatedBy = function (schema) {
 
   if (typeof schema === 'function') {
     return function () {
-      var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(aggregateInstance, command) {
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(aggregateInstance, command) {
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
@@ -152,9 +160,9 @@ only.ifCommandValidatedBy = function (schema) {
   }
 
   return function () {
-    var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(aggregateInstance, command) {
+    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(aggregateInstance, command) {
       var isValid, propertyName;
-      return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      return _regenerator2.default.wrap(function _callee5$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
@@ -198,8 +206,8 @@ only.ifStateValidatedBy = function (schema) {
 
   if (typeof schema === 'function') {
     return function () {
-      var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(aggregateInstance, command) {
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(aggregateInstance, command) {
+        return _regenerator2.default.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
@@ -225,9 +233,9 @@ only.ifStateValidatedBy = function (schema) {
   }
 
   return function () {
-    var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(aggregateInstance, command) {
+    var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(aggregateInstance, command) {
       var isValid, propertyName;
-      return regeneratorRuntime.wrap(function _callee7$(_context7) {
+      return _regenerator2.default.wrap(function _callee7$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
