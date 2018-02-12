@@ -5,13 +5,15 @@ const assert = require('assertthat');
 const only = require('../../lib/only');
 
 suite('only', () => {
-  test('is an object.', async () => {
+  test('is an object.', done => {
     assert.that(only).is.ofType('object');
+    done();
   });
 
   suite('ifExists', () => {
-    test('is a function.', async () => {
+    test('is a function.', done => {
       assert.that(only.ifExists).is.ofType('function');
+      done();
     });
 
     suite('instance', () => {
@@ -21,11 +23,12 @@ suite('only', () => {
         ifExists = only.ifExists();
       });
 
-      test('is a function.', async () => {
+      test('is a function.', done => {
         assert.that(ifExists).is.ofType('function');
+        done();
       });
 
-      test('passes if the aggregate instance exists.', async () => {
+      test('marks as ready for next if the aggregate instance exists.', done => {
         const aggregate = {
           exists () {
             return true;
@@ -34,10 +37,14 @@ suite('only', () => {
 
         const command = {};
 
-        await ifExists(aggregate, command);
+        ifExists(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
 
-      test('throws an error if the aggregate instance does not exist.', async () => {
+      test('marks as rejected if the aggregate instance does not exist.', done => {
         const aggregate = {
           exists () {
             return false;
@@ -50,16 +57,20 @@ suite('only', () => {
           }
         };
 
-        await assert.that(async () => {
-          await ifExists(aggregate, command);
-        }).is.throwingAsync('Peer group does not exist.');
+        ifExists(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Peer group does not exist.');
+            done();
+          }
+        });
       });
     });
   });
 
   suite('ifNotExists', () => {
-    test('is a function.', async () => {
+    test('is a function.', done => {
       assert.that(only.ifNotExists).is.ofType('function');
+      done();
     });
 
     suite('instance', () => {
@@ -69,11 +80,12 @@ suite('only', () => {
         ifNotExists = only.ifNotExists();
       });
 
-      test('is a function.', async () => {
+      test('is a function.', done => {
         assert.that(ifNotExists).is.ofType('function');
+        done();
       });
 
-      test('passes if the aggregate instance does not exist.', async () => {
+      test('marks as ready for next if the aggregate instance does not exist.', done => {
         const aggregate = {
           exists () {
             return false;
@@ -82,10 +94,14 @@ suite('only', () => {
 
         const command = {};
 
-        await ifNotExists(aggregate, command);
+        ifNotExists(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
 
-      test('throws an error if the aggregate instance exists.', async () => {
+      test('marks as rejected if the aggregate instance exists.', done => {
         const aggregate = {
           exists () {
             return true;
@@ -98,26 +114,31 @@ suite('only', () => {
           }
         };
 
-        await assert.that(async () => {
-          await ifNotExists(aggregate, command);
-        }).is.throwingAsync('Peer group already exists.');
+        ifNotExists(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Peer group already exists.');
+            done();
+          }
+        });
       });
     });
   });
 
   suite('ifInPhase', () => {
-    test('is a function.', async () => {
+    test('is a function.', done => {
       assert.that(only.ifInPhase).is.ofType('function');
+      done();
     });
 
     suite('instance', () => {
-      test('is a function.', async () => {
+      test('is a function.', done => {
         const ifInPhase = only.ifInPhase('draft');
 
         assert.that(ifInPhase).is.ofType('function');
+        done();
       });
 
-      test('passes if the aggregate instance state contains the given phase.', async () => {
+      test('marks as ready for next if the aggregate instance state contains the given phase.', done => {
         const ifInPhase = only.ifInPhase('draft');
 
         const aggregate = {
@@ -128,10 +149,14 @@ suite('only', () => {
 
         const command = {};
 
-        await ifInPhase(aggregate, command);
+        ifInPhase(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
 
-      test('passes if the aggregate instance state contains one of the given phases.', async () => {
+      test('marks as ready for next if the aggregate instance state contains one of the given phases.', done => {
         const ifInPhase = only.ifInPhase([ 'initial', 'draft', 'final' ]);
 
         const aggregate = {
@@ -142,10 +167,14 @@ suite('only', () => {
 
         const command = {};
 
-        await ifInPhase(aggregate, command);
+        ifInPhase(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
 
-      test('passes if the aggregate instance state contains the given phase, albeit using a different name.', async () => {
+      test('marks as ready for next if the aggregate instance state contains the given phase, albeit using a different name.', done => {
         const ifInPhase = only.ifInPhase('draft', 'workflowStep');
 
         const aggregate = {
@@ -156,10 +185,14 @@ suite('only', () => {
 
         const command = {};
 
-        await ifInPhase(aggregate, command);
+        ifInPhase(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
 
-      test('throws an error if the aggregate instance state does not contain the given phase.', async () => {
+      test('marks as rejected if the aggregate instance state does not contain the given phase.', done => {
         const ifInPhase = only.ifInPhase([ 'initial', 'final' ]);
 
         const aggregate = {
@@ -170,22 +203,64 @@ suite('only', () => {
 
         const command = {};
 
-        await assert.that(async () => {
-          await ifInPhase(aggregate, command);
-        }).is.throwingAsync('Invalid phase.');
+        ifInPhase(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Invalid phase.');
+            done();
+          }
+        });
+      });
+    });
+  });
+
+  suite('ifValidatedBy', () => {
+    test('is a function.', done => {
+      assert.that(only.ifValidatedBy).is.ofType('function');
+      done();
+    });
+
+    suite('instance', () => {
+      test('marks as ready for next if the command data is valid.', done => {
+        const ifValidatedBy = only.ifValidatedBy({
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            age: { type: 'number' },
+            pets: { type: 'array', items: { type: 'string' }}
+          },
+          required: [ 'name', 'age', 'pets' ]
+        });
+
+        const aggregate = {};
+
+        const command = {
+          data: {
+            name: 'Jane Doe',
+            age: 35,
+            pets: [ 'Alice' ]
+          }
+        };
+
+        ifValidatedBy(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
     });
   });
 
   suite('ifCommandValidatedBy', () => {
-    test('is a function.', async () => {
+    test('is a function.', done => {
       assert.that(only.ifCommandValidatedBy).is.ofType('function');
+      done();
     });
 
-    test('throws an error if schema is missing.', async () => {
+    test('throws an error if schema is missing.', done => {
       assert.that(() => {
         only.ifCommandValidatedBy();
       }).is.throwing('Schema is missing.');
+      done();
     });
 
     suite('instance', () => {
@@ -203,11 +278,12 @@ suite('only', () => {
         });
       });
 
-      test('is a function.', async () => {
+      test('is a function.', done => {
         assert.that(ifCommandValidatedBy).is.ofType('function');
+        done();
       });
 
-      test('passes if the command data is valid.', async () => {
+      test('marks as ready for next if the command data is valid.', done => {
         const aggregate = {};
 
         const command = {
@@ -218,10 +294,14 @@ suite('only', () => {
           }
         };
 
-        await ifCommandValidatedBy(aggregate, command);
+        ifCommandValidatedBy(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
 
-      test('throws an error if the command data is not valid.', async () => {
+      test('marks as rejected if the command data is not valid.', done => {
         const aggregate = {};
 
         const command = {
@@ -232,12 +312,15 @@ suite('only', () => {
           }
         };
 
-        await assert.that(async () => {
-          await ifCommandValidatedBy(aggregate, command);
-        }).is.throwingAsync('Age is invalid.');
+        ifCommandValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Age is invalid.');
+            done();
+          }
+        });
       });
 
-      test('throws an error if nested command data is not valid.', async () => {
+      test('marks as rejected if nested command data is not valid.', done => {
         const aggregate = {};
 
         const command = {
@@ -248,31 +331,40 @@ suite('only', () => {
           }
         };
 
-        await assert.that(async () => {
-          await ifCommandValidatedBy(aggregate, command);
-        }).is.throwingAsync('Pets/1 is invalid.');
+        ifCommandValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Pets/1 is invalid.');
+            done();
+          }
+        });
       });
 
-      test('throws an error if the command data is empty.', async () => {
+      test('marks as rejected if the command data is empty.', done => {
         const aggregate = {};
 
         const command = {
           data: {}
         };
 
-        await assert.that(async () => {
-          await ifCommandValidatedBy(aggregate, command);
-        }).is.throwingAsync('Data is invalid.');
+        ifCommandValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Data is invalid.');
+            done();
+          }
+        });
       });
 
-      test('throws an error if the command data is missing.', async () => {
+      test('marks as rejected if the command data is missing.', done => {
         const aggregate = {};
 
         const command = {};
 
-        await assert.that(async () => {
-          await ifCommandValidatedBy(aggregate, command);
-        }).is.throwingAsync('Data is invalid.');
+        ifCommandValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Data is invalid.');
+            done();
+          }
+        });
       });
 
       suite('with a validation function', () => {
@@ -281,7 +373,7 @@ suite('only', () => {
             typeof commandData.name === 'string');
         });
 
-        test('passes if the validation functions returns true.', async () => {
+        test('marks as ready for next if the validation functions returns true.', done => {
           const aggregate = {};
 
           const command = {
@@ -290,10 +382,14 @@ suite('only', () => {
             }
           };
 
-          await ifCommandValidatedBy(aggregate, command);
+          ifCommandValidatedBy(aggregate, command, {
+            asReadyForNext () {
+              done();
+            }
+          });
         });
 
-        test('throws an error if the validation functions returns false.', async () => {
+        test('marks as rejected if the validation functions returns false.', done => {
           const aggregate = {};
 
           const command = {
@@ -302,23 +398,28 @@ suite('only', () => {
             }
           };
 
-          await assert.that(async () => {
-            await ifCommandValidatedBy(aggregate, command);
-          }).is.throwingAsync('Data is invalid.');
+          ifCommandValidatedBy(aggregate, command, {
+            asRejected (reason) {
+              assert.that(reason).is.equalTo('Data is invalid.');
+              done();
+            }
+          });
         });
       });
     });
   });
 
   suite('ifStateValidatedBy', () => {
-    test('is a function.', async () => {
+    test('is a function.', done => {
       assert.that(only.ifStateValidatedBy).is.ofType('function');
+      done();
     });
 
-    test('throws an error if schema is missing.', async () => {
+    test('throws an error if schema is missing.', done => {
       assert.that(() => {
         only.ifStateValidatedBy();
       }).is.throwing('Schema is missing.');
+      done();
     });
 
     suite('instance', () => {
@@ -336,11 +437,12 @@ suite('only', () => {
         });
       });
 
-      test('is a function.', async () => {
+      test('is a function.', done => {
         assert.that(ifStateValidatedBy).is.ofType('function');
+        done();
       });
 
-      test('passes if the aggregate state is valid.', async () => {
+      test('marks as ready for next if the aggregate state is valid.', done => {
         const aggregate = {
           state: {
             name: 'Jane Doe',
@@ -351,10 +453,14 @@ suite('only', () => {
 
         const command = {};
 
-        await ifStateValidatedBy(aggregate, command);
+        ifStateValidatedBy(aggregate, command, {
+          asReadyForNext () {
+            done();
+          }
+        });
       });
 
-      test('throws an error if the aggregate state is not valid.', async () => {
+      test('marks as rejected if the aggregate state is not valid.', done => {
         const aggregate = {
           state: {
             name: 'Jane Doe',
@@ -365,12 +471,15 @@ suite('only', () => {
 
         const command = {};
 
-        await assert.that(async () => {
-          await ifStateValidatedBy(aggregate, command);
-        }).is.throwingAsync('Age is invalid.');
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Age is invalid.');
+            done();
+          }
+        });
       });
 
-      test('throws an error if nested aggregate state is not valid.', async () => {
+      test('marks as rejected if nested aggregate state is not valid.', done => {
         const aggregate = {
           state: {
             name: 'Jane Doe',
@@ -381,31 +490,40 @@ suite('only', () => {
 
         const command = {};
 
-        await assert.that(async () => {
-          await ifStateValidatedBy(aggregate, command);
-        }).is.throwingAsync('Pets/1 is invalid.');
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Pets/1 is invalid.');
+            done();
+          }
+        });
       });
 
-      test('throws an error if the aggregate state is empty.', async () => {
+      test('marks as rejected if the aggregate state is empty.', done => {
         const aggregate = {
           state: {}
         };
 
         const command = {};
 
-        await assert.that(async () => {
-          await ifStateValidatedBy(aggregate, command);
-        }).is.throwingAsync('Data is invalid.');
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Data is invalid.');
+            done();
+          }
+        });
       });
 
-      test('throws an error if the aggregate state is missing.', async () => {
+      test('marks as rejected if the aggregate state is missing.', done => {
         const aggregate = {};
 
         const command = {};
 
-        await assert.that(async () => {
-          await ifStateValidatedBy(aggregate, command);
-        }).is.throwingAsync('Data is invalid.');
+        ifStateValidatedBy(aggregate, command, {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Data is invalid.');
+            done();
+          }
+        });
       });
 
       suite('with a validation function', () => {
@@ -414,7 +532,7 @@ suite('only', () => {
             typeof aggregateState.name === 'string');
         });
 
-        test('passes if the validation functions returns true.', async () => {
+        test('marks as ready for next if the validation functions returns true.', done => {
           const aggregate = {
             state: {
               name: 'Jane Doe'
@@ -423,10 +541,14 @@ suite('only', () => {
 
           const command = {};
 
-          await ifStateValidatedBy(aggregate, command);
+          ifStateValidatedBy(aggregate, command, {
+            asReadyForNext () {
+              done();
+            }
+          });
         });
 
-        test('throws an error if the validation functions returns false.', async () => {
+        test('marks as rejected if the validation functions returns false.', done => {
           const aggregate = {
             state: {
               name: 23
@@ -435,9 +557,12 @@ suite('only', () => {
 
           const command = {};
 
-          await assert.that(async () => {
-            await ifStateValidatedBy(aggregate, command);
-          }).is.throwingAsync('Data is invalid.');
+          ifStateValidatedBy(aggregate, command, {
+            asRejected (reason) {
+              assert.that(reason).is.equalTo('Data is invalid.');
+              done();
+            }
+          });
         });
       });
     });

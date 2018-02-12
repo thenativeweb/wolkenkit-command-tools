@@ -6,23 +6,26 @@ const assert = require('assertthat'),
 const handle = require('../../lib/handle');
 
 /* eslint-disable prefer-arrow-callback */
-suite('handle', () => {
-  test('is an object.', async () => {
+suite('handle', function () {
+  test('is an object.', function (done) {
     assert.that(handle).is.ofType('object');
+    done();
   });
 
-  suite('physicalEvents', () => {
-    test('is a function.', async () => {
+  suite('physicalEvents', function () {
+    test('is a function.', function (done) {
       assert.that(handle.physicalEvents).is.ofType('function');
+      done();
     });
 
-    test('throws an error if schemas are missing.', async () => {
+    test('throws an error if schemas are missing.', function (done) {
       assert.that(() => {
         handle.physicalEvents();
       }).is.throwing('Schemas are missing.');
+      done();
     });
 
-    suite('instance', () => {
+    suite('instance', function () {
       let physicalEvents;
 
       setup(() => {
@@ -42,11 +45,12 @@ suite('handle', () => {
         });
       });
 
-      test('is a function.', async () => {
+      test('is a function.', function (done) {
         assert.that(physicalEvents).is.ofType('function');
+        done();
       });
 
-      test('throws an error if the command does not contain an event name.', async () => {
+      test('marks as rejected if the command does not contain an event name.', function (done) {
         const aggregate = {};
 
         const command = new Command({
@@ -58,12 +62,17 @@ suite('handle', () => {
           }
         });
 
-        await assert.that(async () => {
-          await physicalEvents(aggregate, command);
-        }).is.throwingAsync('Invalid request.');
+        const mark = {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Invalid request.');
+            done();
+          }
+        };
+
+        physicalEvents(aggregate, command, mark);
       });
 
-      test('throws an error if the command does not contain event data.', async () => {
+      test('marks as rejected if the command does not contain event data.', function (done) {
         const aggregate = {};
 
         const command = new Command({
@@ -75,12 +84,17 @@ suite('handle', () => {
           }
         });
 
-        await assert.that(async () => {
-          await physicalEvents(aggregate, command);
-        }).is.throwingAsync('Invalid request.');
+        const mark = {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Invalid request.');
+            done();
+          }
+        };
+
+        physicalEvents(aggregate, command, mark);
       });
 
-      test('throws an error if an invalid event name is given.', async () => {
+      test('marks as rejected if an invalid event name is given.', function (done) {
         const aggregate = {};
 
         const command = new Command({
@@ -93,12 +107,17 @@ suite('handle', () => {
           }
         });
 
-        await assert.that(async () => {
-          await physicalEvents(aggregate, command);
-        }).is.throwingAsync('Invalid request.');
+        const mark = {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Invalid request.');
+            done();
+          }
+        };
+
+        physicalEvents(aggregate, command, mark);
       });
 
-      test('throws an error if the event data does not match the schema.', async () => {
+      test('marks as rejected if the event data does not match the schema.', function (done) {
         const aggregate = {};
 
         const command = new Command({
@@ -111,20 +130,22 @@ suite('handle', () => {
           }
         });
 
-        await assert.that(async () => {
-          await physicalEvents(aggregate, command);
-        }).is.throwingAsync('Invalid request.');
+        const mark = {
+          asRejected (reason) {
+            assert.that(reason).is.equalTo('Invalid request.');
+            done();
+          }
+        };
+
+        physicalEvents(aggregate, command, mark);
       });
 
-      test('publishes the event if everything is fine.', async () => {
+      test('publishes the event and marks as done if everything is fine.', function (done) {
         const now = new Date();
-
-        let wasPublished = false;
 
         const aggregate = {
           events: {
             publish (name, data) {
-              wasPublished = true;
               assert.that(name).is.equalTo('opened');
               assert.that(data).is.equalTo({
                 when: now
@@ -145,9 +166,13 @@ suite('handle', () => {
           }
         });
 
-        await physicalEvents(aggregate, command);
+        const mark = {
+          asDone () {
+            done();
+          }
+        };
 
-        assert.that(wasPublished).is.true();
+        physicalEvents(aggregate, command, mark);
       });
     });
   });

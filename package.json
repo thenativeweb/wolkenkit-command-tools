@@ -18,15 +18,15 @@
   ],
   "main": "dist/index.js",
   "dependencies": {
-    "ajv": "6.1.1",
+    "ajv": "5.5.2",
     "humanize-string": "1.0.1",
-    "require-dir": "1.0.0"
+    "require-dir": "0.3.2"
   },
   "devDependencies": {
-    "assertthat": "1.0.0",
-    "commands-events": "1.0.1",
-    "roboter": "0.15.6",
-    "roboter-server": "0.15.6"
+    "assertthat": "0.11.0",
+    "commands-events": "1.0.0",
+    "roboter": "0.15.4",
+    "roboter-server": "0.15.4"
   },
   "repository": {
     "type": "git",
