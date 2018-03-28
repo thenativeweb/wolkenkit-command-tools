@@ -69,7 +69,7 @@ This middleware passes if the aggregate instance exists, otherwise it rejects th
 const commands = {
   join: [
     only.ifExists(),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -84,7 +84,7 @@ This middleware passes if the aggregate instance does not exist, otherwise it re
 const commands = {
   start: [
     only.ifNotExists(),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -104,7 +104,7 @@ const initialState = {
 const commands = {
   join: [
     only.ifInPhase('started'),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -122,7 +122,7 @@ const initialState = {
 const commands = {
   join: [
     only.ifInPhase([ 'started', 'ready' ]),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -140,7 +140,7 @@ const initialState = {
 const commands = {
   join: [
     only.ifInPhase('started', 'workflowStep'),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -160,7 +160,7 @@ const commands = {
         // ...
       }
     }),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -177,7 +177,7 @@ const commands = {
       // - or -
       // return false;
     }),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -197,7 +197,7 @@ const commands = {
         // ...
       }
     }),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -214,7 +214,7 @@ const commands = {
       // - or -
       // return false;
     }),
-    (peerGroup, command, mark) => {
+    async (peerGroup, command) => {
       // ...
     }
   ]
@@ -225,13 +225,13 @@ const commands = {
 
 To build this module use [roboter](https://www.npmjs.com/package/roboter).
 
-```bash
+```shell
 $ bot
 ```
 
 ## License
 
-Copyright (c) 2015-2017 the native web.
+Copyright (c) 2015-2018 the native web.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
