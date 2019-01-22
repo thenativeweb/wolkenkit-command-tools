@@ -2,7 +2,7 @@
 
 const assert = require('assertthat');
 
-const only = require('../../lib/only');
+const only = require('../../src/only');
 
 suite('only', () => {
   test('is an object.', async () => {
