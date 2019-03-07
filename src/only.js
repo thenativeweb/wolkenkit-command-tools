@@ -105,4 +105,49 @@ only.ifStateValidatedBy = function (schema) {
   };
 };
 
+only.ifAggregateExists = function ({ context, aggregate, provider, options = { rejectWhenMissingId: false } }) {
+  if (typeof context !== 'string') {
+    throw new Error('Domain name must be a string.');
+  }
+  if (typeof aggregate !== 'string') {
+    throw new Error('Aggregate name must be a string.');
+  }
+  if (typeof provider !== 'function') {
+    throw new Error('Id provider must be a function.');
+  }
+  if (typeof options !== 'object') {
+    throw new Error('Options must be an object.');
+  }
+
+  const { rejectWhenMissingId } = options;
+
+  return async function (instance, command, services) {
+    const { app } = services;
+
+    if (!app[context]) {
+      return command.reject(`${context} does not exist.`);
+    }
+    if (!app[context][aggregate]) {
+      return command.reject(`${context}.${aggregate} does not exist.`);
+    }
+
+    let id;
+    try {
+      id = provider(instance, command, services);
+    } catch (err) {
+      return command.reject(`Unable to extract aggregate id: ${err.message}`);
+    }
+
+    if (!id && rejectWhenMissingId) {
+      return command.reject(`Unable to extract aggregate id`);
+    }
+
+    try {
+      await app[context][aggregate](id).read();
+    } catch (err) {
+      command.reject(err.message);
+    }
+  }
+};
+
 module.exports = only;
