@@ -105,7 +105,7 @@ only.ifStateValidatedBy = function (schema) {
   };
 };
 
-only.ifAggregateExists = function ({ context, aggregate, provider, options = { rejectWhenMissingId: false } }) {
+only.ifAggregateExists = function ({ context, aggregate, provider, options = { rejectWhenMissingId: false }}) {
   if (typeof context !== 'string') {
     throw new Error('Domain name must be a string.');
   }
@@ -132,6 +132,7 @@ only.ifAggregateExists = function ({ context, aggregate, provider, options = { r
     }
 
     let id;
+
     try {
       id = provider(instance, command, services);
     } catch (err) {
@@ -147,7 +148,7 @@ only.ifAggregateExists = function ({ context, aggregate, provider, options = { r
     } catch (err) {
       command.reject(err.message);
     }
-  }
+  };
 };
 
 module.exports = only;

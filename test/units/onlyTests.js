@@ -499,10 +499,10 @@ suite('only', () => {
     const context = 'context';
     const aggregate = 'aggregate';
     const defaultCommand = {
-      reject(reason) {
+      reject (reason) {
         throw new Error(reason);
       }
-    }
+    };
 
     test('is a function.', async () => {
       assert.that(only.ifAggregateExists).is.ofType('function');
@@ -542,7 +542,7 @@ suite('only', () => {
         ifAggregateExists = only.ifAggregateExists({
           context,
           aggregate,
-          provider(_, command) {
+          provider (_, command) {
             return command.data.id;
           }
         });
@@ -578,7 +578,7 @@ suite('only', () => {
         const services = {
           app: {
             context: {
-              aggregate(id) {
+              aggregate () {
               }
             }
           }
@@ -593,7 +593,7 @@ suite('only', () => {
         const services = {
           app: {
             context: {
-              aggregate(id) {
+              aggregate () {
               }
             }
           }
@@ -602,7 +602,7 @@ suite('only', () => {
         const ifAggregateExistsRejectWhenMissingId = only.ifAggregateExists({
           context,
           aggregate,
-          provider(_, command) {
+          provider (_, command) {
             return command.data.id;
           },
           options: { rejectWhenMissingId: true }
@@ -611,7 +611,7 @@ suite('only', () => {
         const command = {
           ...defaultCommand,
           data: {}
-        }
+        };
 
         assert.that(async () => {
           await ifAggregateExistsRejectWhenMissingId({}, command, services);
@@ -623,7 +623,7 @@ suite('only', () => {
           app: {
             context: {
               aggregate: () => ({
-                read() {
+                read () {
                   throw new Error('Aggregate not found.');
                 }
               })
@@ -638,7 +638,7 @@ suite('only', () => {
 
         assert.that(async () => {
           await ifAggregateExists({}, command, services);
-        }).is.throwingAsync('Aggregate not found.')
+        }).is.throwingAsync('Aggregate not found.');
       });
 
       test('passes when read succeeds', async () => {
@@ -646,7 +646,8 @@ suite('only', () => {
           app: {
             context: {
               aggregate: () => ({
-                async read() {
+                read () {
+                  return Promise.resolve();
                 }
               })
             }
