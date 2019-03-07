@@ -661,6 +661,27 @@ suite('only', () => {
 
         await ifAggregateExists({}, command, services);
       });
+
+      test('passes when relation is optional', async () => {
+        const services = {
+          app: {
+            context: {
+              aggregate: () => ({
+                read () {
+                  return Promise.resolve();
+                }
+              })
+            }
+          }
+        };
+
+        const command = {
+          ...defaultCommand,
+          data: {}
+        };
+
+        await ifAggregateExists({}, command, services);
+      });
     });
   });
 });
