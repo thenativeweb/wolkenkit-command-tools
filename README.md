@@ -231,7 +231,7 @@ It accepts the following parameters in an object as a single argument:
 * `aggregate`: the name of the related aggregate
 * `options`: 
   * `rejectWhenMissingId` (default: `false`): Rejects the command if the provider function does not return a value.
-    Default behaviour allows to pass through if the relation is optional.
+    Default behaviour passes through if the relation is optional.
 
 * `provider`: function to extract the id of the related aggregate 
   
