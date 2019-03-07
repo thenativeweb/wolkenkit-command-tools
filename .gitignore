@@ -8,3 +8,7 @@
 # OS generated files and folders
 .DS_Store
 npm-debug.log
+
+# IntelliJ IDEA project files
+.idea
+*.iml
