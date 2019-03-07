@@ -494,4 +494,172 @@ suite('only', () => {
       });
     });
   });
+
+  suite('ifAggregateExists', () => {
+    const context = 'context';
+    const aggregate = 'aggregate';
+    const defaultCommand = {
+      reject(reason) {
+        throw new Error(reason);
+      }
+    }
+
+    test('is a function.', async () => {
+      assert.that(only.ifAggregateExists).is.ofType('function');
+    });
+
+    test('throws an error if context is missing.', async () => {
+      assert.that(() => {
+        only.ifAggregateExists({});
+      }).is.throwing('Domain name must be a string.');
+    });
+
+    test('throws an error if aggregate is missing.', async () => {
+      assert.that(() => {
+        only.ifAggregateExists({ context });
+      }).is.throwing('Aggregate name must be a string.');
+    });
+
+    test('throws an error if provider is not a function.', async () => {
+      assert.that(() => {
+        only.ifAggregateExists({ context, aggregate, provider: 'provider' });
+      }).is.throwing('Id provider must be a function.');
+    });
+
+    test('throws an error if options is not an object.', async () => {
+      const provider = () => true;
+      const options = 'some string';
+
+      assert.that(() => {
+        only.ifAggregateExists({ context, aggregate, provider, options });
+      }).is.throwing('Options must be an object.');
+    });
+
+    suite('instance', () => {
+      let ifAggregateExists;
+
+      setup(() => {
+        ifAggregateExists = only.ifAggregateExists({
+          context,
+          aggregate,
+          provider(_, command) {
+            return command.data.id;
+          }
+        });
+      });
+
+      test('is a function.', async () => {
+        assert.that(ifAggregateExists).is.ofType('function');
+      });
+
+      test('throws an error when context does not exist', async () => {
+        const services = {
+          app: {}
+        };
+
+        assert.that(async () => {
+          await ifAggregateExists({}, defaultCommand, services);
+        }).is.throwingAsync('context does not exist.');
+      });
+
+      test('throws an error when aggregate does not exist', async () => {
+        const services = {
+          app: {
+            context: {}
+          }
+        };
+
+        assert.that(async () => {
+          await ifAggregateExists({}, defaultCommand, services);
+        }).is.throwingAsync('context.aggregate does not exist.');
+      });
+
+      test('throws an error when id provider fails to extract id', async () => {
+        const services = {
+          app: {
+            context: {
+              aggregate(id) {
+              }
+            }
+          }
+        };
+
+        assert.that(async () => {
+          await ifAggregateExists({}, defaultCommand, services);
+        }).is.throwingAsync('Unable to extract aggregate id: Cannot read property \'id\' of undefined');
+      });
+
+      test('throws an error when it should reject on missing id and no id is extracted', async () => {
+        const services = {
+          app: {
+            context: {
+              aggregate(id) {
+              }
+            }
+          }
+        };
+
+        const ifAggregateExistsRejectWhenMissingId = only.ifAggregateExists({
+          context,
+          aggregate,
+          provider(_, command) {
+            return command.data.id;
+          },
+          options: { rejectWhenMissingId: true }
+        });
+
+        const command = {
+          ...defaultCommand,
+          data: {}
+        }
+
+        assert.that(async () => {
+          await ifAggregateExistsRejectWhenMissingId({}, command, services);
+        }).is.throwingAsync('Unable to extract aggregate id');
+      });
+
+      test('throws an error when reading aggregate fails', async () => {
+        const services = {
+          app: {
+            context: {
+              aggregate: () => ({
+                read() {
+                  throw new Error('Aggregate not found.');
+                }
+              })
+            }
+          }
+        };
+
+        const command = {
+          ...defaultCommand,
+          data: { id: 'some-id' }
+        };
+
+        assert.that(async () => {
+          await ifAggregateExists({}, command, services);
+        }).is.throwingAsync('Aggregate not found.')
+      });
+
+      test('passes when read succeeds', async () => {
+        const services = {
+          app: {
+            context: {
+              aggregate: () => ({
+                async read() {
+                }
+              })
+            }
+          }
+        };
+
+        const command = {
+          ...defaultCommand,
+          data: { id: 'some-id' }
+        };
+
+        await ifAggregateExists({}, command, services);
+      });
+    });
+  });
 });
