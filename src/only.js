@@ -107,7 +107,7 @@ only.ifStateValidatedBy = function (schema) {
 
 only.ifAggregateExists = function ({ context, aggregate, provider, options = { rejectWhenMissingId: false }}) {
   if (typeof context !== 'string') {
-    throw new Error('Domain name must be a string.');
+    throw new Error('Context name must be a string.');
   }
   if (typeof aggregate !== 'string') {
     throw new Error('Aggregate name must be a string.');
