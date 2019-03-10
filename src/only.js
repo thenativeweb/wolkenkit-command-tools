@@ -106,17 +106,14 @@ only.ifStateValidatedBy = function (schema) {
 };
 
 only.ifAggregateExists = function ({ context, aggregate, provider, options = { rejectWhenMissingId: false }}) {
-  if (typeof context !== 'string') {
-    throw new Error('Context name must be a string.');
+  if (!context) {
+    throw new Error('Context is missing.');
   }
-  if (typeof aggregate !== 'string') {
-    throw new Error('Aggregate name must be a string.');
+  if (!aggregate) {
+    throw new Error('Aggregate is missing.');
   }
-  if (typeof provider !== 'function') {
-    throw new Error('Id provider must be a function.');
-  }
-  if (typeof options !== 'object') {
-    throw new Error('Options must be an object.');
+  if (!provider) {
+    throw new Error('Provider is missing.');
   }
 
   const { rejectWhenMissingId } = options;
