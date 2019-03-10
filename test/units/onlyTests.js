@@ -511,28 +511,19 @@ suite('only', () => {
     test('throws an error if context is missing.', async () => {
       assert.that(() => {
         only.ifAggregateExists({});
-      }).is.throwing('Domain name must be a string.');
+      }).is.throwing('Context is missing.');
     });
 
     test('throws an error if aggregate is missing.', async () => {
       assert.that(() => {
         only.ifAggregateExists({ context });
-      }).is.throwing('Aggregate name must be a string.');
+      }).is.throwing('Aggregate is missing.');
     });
 
-    test('throws an error if provider is not a function.', async () => {
+    test('throws an error if provider is missing.', async () => {
       assert.that(() => {
-        only.ifAggregateExists({ context, aggregate, provider: 'provider' });
-      }).is.throwing('Id provider must be a function.');
-    });
-
-    test('throws an error if options is not an object.', async () => {
-      const provider = () => true;
-      const options = 'some string';
-
-      assert.that(() => {
-        only.ifAggregateExists({ context, aggregate, provider, options });
-      }).is.throwing('Options must be an object.');
+        only.ifAggregateExists({ context, aggregate });
+      }).is.throwing('Provider is missing.');
     });
 
     suite('instance', () => {
