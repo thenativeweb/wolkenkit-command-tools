@@ -636,11 +636,17 @@ suite('only', () => {
         const services = {
           app: {
             context: {
-              aggregate: () => ({
-                read () {
-                  return Promise.resolve();
+              aggregate: id => {
+                if (!id) {
+                  throw new Error('Aggregate id is missing.');
                 }
-              })
+
+                return {
+                  read () {
+                    return Promise.resolve();
+                  }
+                };
+              }
             }
           }
         };
@@ -657,11 +663,17 @@ suite('only', () => {
         const services = {
           app: {
             context: {
-              aggregate: () => ({
-                read () {
-                  return Promise.resolve();
+              aggregate: id => {
+                if (!id) {
+                  throw new Error('Aggregate id is missing.');
                 }
-              })
+
+                return {
+                  read () {
+                    return Promise.resolve();
+                  }
+                };
+              }
             }
           }
         };
