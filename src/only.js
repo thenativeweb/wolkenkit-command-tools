@@ -141,7 +141,9 @@ only.ifAggregateExists = function ({ context, aggregate, provider, options = { r
     }
 
     try {
-      await app[context][aggregate](id).read();
+      if (id) {
+        await app[context][aggregate](id).read();
+      }
     } catch (err) {
       command.reject(err.message);
     }
