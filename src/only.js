@@ -105,7 +105,7 @@ only.ifStateValidatedBy = function (schema) {
   };
 };
 
-only.ifAggregateExists = function ({ context, aggregate, provider, options = { rejectWhenMissingId: false }}) {
+only.ifAggregateExists = function ({ context, aggregate, provider, isOptional = false }) {
   if (!context) {
     throw new Error('Context is missing.');
   }
@@ -115,8 +115,6 @@ only.ifAggregateExists = function ({ context, aggregate, provider, options = { r
   if (!provider) {
     throw new Error('Provider is missing.');
   }
-
-  const { rejectWhenMissingId } = options;
 
   return async function (instance, command, services) {
     const { app } = services;
@@ -136,7 +134,7 @@ only.ifAggregateExists = function ({ context, aggregate, provider, options = { r
       return command.reject(`Unable to extract aggregate id: ${err.message}`);
     }
 
-    if (!id && rejectWhenMissingId) {
+    if (!(id || isOptional)) {
       return command.reject(`Unable to extract aggregate id`);
     }
 
