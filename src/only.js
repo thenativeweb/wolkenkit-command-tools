@@ -131,7 +131,7 @@ only.ifAggregateExists = function ({ context, aggregate, provider, options = { r
     let id;
 
     try {
-      id = provider(instance, command, services);
+      id = provider(command);
     } catch (err) {
       return command.reject(`Unable to extract aggregate id: ${err.message}`);
     }

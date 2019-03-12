@@ -533,9 +533,7 @@ suite('only', () => {
         ifAggregateExists = only.ifAggregateExists({
           context,
           aggregate,
-          provider (_, command) {
-            return command.data.id;
-          }
+          provider: command => command.data.id
         });
       });
 
@@ -593,9 +591,7 @@ suite('only', () => {
         const ifAggregateExistsRejectWhenMissingId = only.ifAggregateExists({
           context,
           aggregate,
-          provider (_, command) {
-            return command.data.id;
-          },
+          provider: command => command.data.id,
           options: { rejectWhenMissingId: true }
         });
 
