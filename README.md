@@ -227,21 +227,12 @@ This middleware passes if the requested related aggregate exists, otherwise it r
 
 It accepts the following parameters in an object as a single argument:
 
-* `context`: the name of the context the related aggregate belongs
-* `aggregate`: the name of the related aggregate
-* `options`: 
-  * `rejectWhenMissingId` (default: `false`): Rejects the command if the provider function does not return a value.
-    Default behaviour passes through if the relation is optional.
-
-* `provider`: function to extract the id of the related aggregate 
-  
-  Receives as arguments:
-  
-  * `aggregateInstance`: the current aggregate
-  * `command`: the command
-  * `services`: the services injected in a middleware
-  
-  Returns: the identifier of the related aggregate 
+* `context`: the context the related aggregate belongs to
+* `aggregate`: the related aggregate
+* `provider`: function that returns the id of the related aggregate from the `command`
+* `isOptional`: Indicates whether the relation is optional. 
+  Default is `false` and will ensure that the `provider` extracts an identifier.
+  When set to `true` the middleware will skip validation when `provider` does not extract a value.
 
 *Please note that due to the eventual consistency of the system you cannot 100% guarantee that
 the aggregate effectively exists.*
@@ -252,10 +243,8 @@ const commands = {
     only.ifAggregateExists({ 
       context: 'planning', 
       aggregate: 'initiator', 
-      provider(message, command, services) {
-         return command.data.initiator; // provides the id of the aggregate to check
-      },
-      options: { rejectWhenMissingId: true } // Rejects the command when the provider cannot extract an id.
+      provider: command => command.data.initiator, // provides the id of the aggregate to check
+      isOptional: true // Command will pass when the provider cannot extract an id.
     }),
     async (peerGroup, command) => {
       // ...
