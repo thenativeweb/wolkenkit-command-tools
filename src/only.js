@@ -105,4 +105,47 @@ only.ifStateValidatedBy = function (schema) {
   };
 };
 
+only.ifAggregateExists = function ({ context, aggregate, provider, isOptional = false }) {
+  if (!context) {
+    throw new Error('Context is missing.');
+  }
+  if (!aggregate) {
+    throw new Error('Aggregate is missing.');
+  }
+  if (!provider) {
+    throw new Error('Provider is missing.');
+  }
+
+  return async function (instance, command, services) {
+    const { app } = services;
+
+    if (!app[context]) {
+      return command.reject(`${context} does not exist.`);
+    }
+    if (!app[context][aggregate]) {
+      return command.reject(`${context}.${aggregate} does not exist.`);
+    }
+
+    let id;
+
+    try {
+      id = provider(command);
+    } catch (err) {
+      return command.reject(`Unable to extract aggregate id: ${err.message}`);
+    }
+
+    if (!(id || isOptional)) {
+      return command.reject(`Unable to extract aggregate id`);
+    }
+
+    try {
+      if (id) {
+        await app[context][aggregate](id).read();
+      }
+    } catch (err) {
+      command.reject(err.message);
+    }
+  };
+};
+
 module.exports = only;

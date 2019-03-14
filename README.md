@@ -221,6 +221,38 @@ const commands = {
 };
 ```
 
+#### only.ifAggregateExists
+
+This middleware passes if the requested related aggregate exists, otherwise it rejects the command. 
+
+It accepts the following parameters in an object as a single argument:
+
+* `context`: the context the related aggregate belongs to
+* `aggregate`: the related aggregate
+* `provider`: function that returns the id of the related aggregate from the `command`
+* `isOptional`: Indicates whether the relation is optional. 
+  Default is `false` and will ensure that the `provider` extracts an identifier.
+  When set to `true` the middleware will skip validation when `provider` does not extract a value.
+
+*Please note that due to the eventual consistency of the system you cannot 100% guarantee that
+the aggregate effectively exists.*
+
+```javascript
+const commands = {
+  send: [
+    only.ifAggregateExists({ 
+      context: 'planning', 
+      aggregate: 'initiator', 
+      provider: command => command.data.initiator, // provides the id of the aggregate to check
+      isOptional: true // Command will pass when the provider cannot extract an id.
+    }),
+    async (peerGroup, command) => {
+      // ...
+    }
+  ]
+}
+```
+
 ## Running the build
 
 To build this module use [roboter](https://www.npmjs.com/package/roboter).

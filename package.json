@@ -14,6 +14,10 @@
     {
       "name": "Jan-Hendrik Grundhöfer",
       "email": "jan-hendrik.grundhoefer@thenativeweb.io"
+    },
+    {
+      "name": "Damien Benon",
+      "email": "damien.benon@myprysm.fr"
     }
   ],
   "main": "dist/index.js",
