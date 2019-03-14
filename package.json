@@ -22,15 +22,15 @@
   ],
   "main": "dist/index.js",
   "dependencies": {
-    "@babel/runtime": "7.3.1",
-    "ajv": "6.7.0",
-    "humanize-string": "1.0.2",
+    "@babel/runtime": "7.3.4",
+    "ajv": "6.10.0",
+    "humanize-string": "2.0.0",
     "require-dir": "1.2.0"
   },
   "devDependencies": {
-    "assertthat": "2.0.1",
+    "assertthat": "2.0.3",
     "commands-events": "1.0.4",
-    "roboter": "3.0.4"
+    "roboter": "4.0.2"
   },
   "repository": {
     "type": "git",

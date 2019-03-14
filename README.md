@@ -91,6 +91,47 @@ const commands = {
 };
 ```
 
+#### only.ifAggregateExists
+
+This middleware passes if another aggregate instance exists, otherwise it rejects the command. You have to provide the names of the related `context` and `aggregate`, and a function to extract the related aggregate's id from the current command:
+
+```javascript
+const commands = {
+  start: [
+    only.ifAggregateExists({
+      contextName: 'planning',
+      aggregateName: 'location',
+      aggregateId (command) {
+        return command.data.location.id;
+      }
+    }),
+    async (peerGroup, command) => {
+      // ...
+    }
+  ]
+}
+```
+
+By default, when the `aggregateId` function is not able to return an aggregate id, the middleware will reject the command. If you want to allow the `aggregateId` to be optional, provide the `isOptional` property and set it to `true`:
+
+```javascript
+const commands = {
+  start: [
+    only.ifAggregateExists({
+      contextName: 'planning',
+      aggregateName: 'location',
+      aggregateId (command) {
+        return command.data.location.id;
+      },
+      isOptional: true
+    }),
+    async (peerGroup, command) => {
+      // ...
+    }
+  ]
+}
+```
+
 #### only.ifInPhase
 
 This middleware passes if the aggregate instance is in the given phase, otherwise it rejects the command.
@@ -221,49 +262,17 @@ const commands = {
 };
 ```
 
-#### only.ifAggregateExists
-
-This middleware passes if the requested related aggregate exists, otherwise it rejects the command. 
-
-It accepts the following parameters in an object as a single argument:
-
-* `context`: the context the related aggregate belongs to
-* `aggregate`: the related aggregate
-* `provider`: function that returns the id of the related aggregate from the `command`
-* `isOptional`: Indicates whether the relation is optional. 
-  Default is `false` and will ensure that the `provider` extracts an identifier.
-  When set to `true` the middleware will skip validation when `provider` does not extract a value.
-
-*Please note that due to the eventual consistency of the system you cannot 100% guarantee that
-the aggregate effectively exists.*
-
-```javascript
-const commands = {
-  send: [
-    only.ifAggregateExists({ 
-      context: 'planning', 
-      aggregate: 'initiator', 
-      provider: command => command.data.initiator, // provides the id of the aggregate to check
-      isOptional: true // Command will pass when the provider cannot extract an id.
-    }),
-    async (peerGroup, command) => {
-      // ...
-    }
-  ]
-}
-```
-
 ## Running the build
 
 To build this module use [roboter](https://www.npmjs.com/package/roboter).
 
 ```shell
-$ bot
+$ npx roboter
 ```
 
 ## License
 
-Copyright (c) 2015-2018 the native web.
+Copyright (c) 2015-2019 the native web.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

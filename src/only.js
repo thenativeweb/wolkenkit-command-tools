@@ -29,6 +29,54 @@ only.ifNotExists = function () {
   };
 };
 
+only.ifAggregateExists = function ({
+  contextName,
+  aggregateName,
+  aggregateId,
+  isOptional = false
+}) {
+  if (!contextName) {
+    throw new Error('Context name is missing.');
+  }
+  if (!aggregateName) {
+    throw new Error('Aggregate name is missing.');
+  }
+  if (!aggregateId) {
+    throw new Error('Aggregate id is missing.');
+  }
+
+  return async function (aggregateInstance, command, { app }) {
+    if (!app[contextName]) {
+      return command.reject(`Invalid context '${contextName}'.`);
+    }
+    if (!app[contextName][aggregateName]) {
+      return command.reject(`Invalid aggregate '${aggregateName}' in context '${contextName}'.`);
+    }
+
+    let aggregateInstanceId;
+
+    try {
+      aggregateInstanceId = aggregateId(command);
+    } catch (err) {
+      return command.reject('Failed to get aggregate id.');
+    }
+
+    if (!aggregateInstanceId) {
+      if (isOptional) {
+        return;
+      }
+
+      return command.reject('Failed to get aggregate id.');
+    }
+
+    try {
+      await app[contextName][aggregateName](aggregateInstanceId).read();
+    } catch (err) {
+      command.reject(err.message);
+    }
+  };
+};
+
 only.ifInPhase = function (phase, propertyName = 'phase') {
   let phases = phase;
 
@@ -101,49 +149,6 @@ only.ifStateValidatedBy = function (schema) {
       }
 
       return command.reject(`${humanizeString(propertyName)} is invalid.`);
-    }
-  };
-};
-
-only.ifAggregateExists = function ({ context, aggregate, provider, isOptional = false }) {
-  if (!context) {
-    throw new Error('Context is missing.');
-  }
-  if (!aggregate) {
-    throw new Error('Aggregate is missing.');
-  }
-  if (!provider) {
-    throw new Error('Provider is missing.');
-  }
-
-  return async function (instance, command, services) {
-    const { app } = services;
-
-    if (!app[context]) {
-      return command.reject(`${context} does not exist.`);
-    }
-    if (!app[context][aggregate]) {
-      return command.reject(`${context}.${aggregate} does not exist.`);
-    }
-
-    let id;
-
-    try {
-      id = provider(command);
-    } catch (err) {
-      return command.reject(`Unable to extract aggregate id: ${err.message}`);
-    }
-
-    if (!(id || isOptional)) {
-      return command.reject(`Unable to extract aggregate id`);
-    }
-
-    try {
-      if (id) {
-        await app[context][aggregate](id).read();
-      }
-    } catch (err) {
-      command.reject(err.message);
     }
   };
 };
